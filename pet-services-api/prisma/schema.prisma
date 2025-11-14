@@ -1,0 +1,147 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole{
+  PET_OWNER
+  PET_PROVIDER
+  ADMIN
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  role UserRole @default(PET_OWNER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  petOnerProfile PetOwner?
+  providerProfile PetProvider?
+}
+
+model PetOwner {
+  id Int @id @default(autoincrement())
+  name String
+  phoneNumber String
+  address String
+  city String
+  uf String
+  cep String
+  cpf String?
+  avatarUrl String?
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+
+  appointments Appointment[]
+  reviews Review[]
+  favoritesProviers PetProvider[] @relation("FavoriteProviders")
+}
+
+model PetProvider {
+  id Int @id @default(autoincrement())
+  companyName String
+  description String
+  location String
+  avatarUrl String?
+  name String
+  phoneNumber String
+  address String
+  city String
+  uf String
+  cep String
+  cnpj String?
+  cpf String?
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+
+  services Service[]
+  appointments Appointment[]
+  reviews Review[]
+  favoritedBy PetOwner[] @relation("FavoriteProviders")
+  images ProviderImage[]
+}
+
+model ServiceType {
+  id Int @id @default(autoincrement())
+  name String @unique
+
+  services Service[]
+}
+
+model Service {
+  id Int @id @default(autoincrement())
+  name String
+  description String
+  price Float
+  durationMinutes Int
+  providerId Int
+  provider PetProvider @relation(fields: [providerId], references: [id])
+  serviceTypeId Int
+  serviceType ServiceType @relation(fields: [serviceTypeId], references: [id])
+  appointments Appointment[]
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+}
+
+model Appointment {
+  id              String               @id @default(uuid())
+  date            DateTime
+  status          AppointmentStatus    @default(PENDING)
+  totalPrice      Float
+
+  providerId      Int
+  provider        PetProvider             @relation(fields: [providerId], references: [id])
+  
+  petOwnerId      Int
+  petOwner        PetOwner             @relation(fields: [petOwnerId], references: [id])
+  
+  serviceId       Int
+  service         Service              @relation(fields: [serviceId], references: [id])
+  
+  review          Review?
+}
+
+model Review {
+  id              String         @id @default(uuid())
+  rating          Int            // 1 a 5 estrelas
+  comment         String?
+  createdAt       DateTime       @default(now())
+
+  appointmentId   String         @unique
+  appointment     Appointment    @relation(fields: [appointmentId], references: [id])
+  
+  petOwnerId      Int
+  petOwner        PetOwner       @relation(fields: [petOwnerId], references: [id])
+  
+  providerId      Int
+  provider        PetProvider       @relation(fields: [providerId], references: [id])
+}
+
+model ProviderImage {
+  id Int @id @default(autoincrement())
+  url String
+  altText String?
+  isCover Boolean @default(false)
+  createdAt DateTime @default(now())
+  providerId Int
+  provider PetProvider @relation(fields: [providerId], references: [id])
+}
+
+
