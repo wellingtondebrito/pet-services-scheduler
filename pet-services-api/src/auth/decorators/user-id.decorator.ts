@@ -27,7 +27,7 @@ export const UserId = createParamDecorator(
       throw new Error('Provider ID no payload JWT não é um número válido.');
     }
 
-    console.log('Provider ID extraído:', userId);
+    console.log('user id decorator ID extraído:', userId);
     return userId;
   },
 );

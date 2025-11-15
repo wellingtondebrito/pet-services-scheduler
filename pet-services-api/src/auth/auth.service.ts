@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterPetOwnerDto } from './dto/RegisterPetOwnerDto';
 import { LoginDto } from './dto/LoginDto';
 import { JwtService } from '@nestjs/jwt';
+import { RegisterAdminDto } from './dto/RegisterAdminDto';
 
 @Injectable()
 export class AuthService {
@@ -97,6 +98,41 @@ export class AuthService {
     });
 
     return petOwner;
+  }
+
+  async registerAdmin(data: RegisterAdminDto) {
+
+     const existingUser = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existingUser) throw new ConflictException('Este e-mail já está cadastrado em nossa plataforma.');
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    
+    const newAdmin = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: data.email,
+          password: hashedPassword,
+          role: UserRole.ADMIN,
+        },
+      });
+      const adminProfile = await tx.admin.create({
+        data: {
+          userId: user.id,
+          name: data.name,
+        },
+      });
+      return {
+        id: user.id,
+        email: user.email,
+        adminProfile: adminProfile,
+      };
+    });
+
+    return newAdmin;
   }
 
   async login(data: LoginDto) {
