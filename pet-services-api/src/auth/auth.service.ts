@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, HttpCode, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterPetProviderDto } from '../auth/dto/RegisterPetProviderDto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
@@ -6,6 +6,7 @@ import * as bcrypt from 'bcrypt';
 import { RegisterPetOwnerDto } from './dto/RegisterPetOwnerDto';
 import { LoginDto } from './dto/LoginDto';
 import { JwtService } from '@nestjs/jwt';
+import { RegisterAdminDto } from './dto/RegisterAdminDto';
 
 @Injectable()
 export class AuthService {
@@ -37,7 +38,8 @@ export class AuthService {
         userId: user.id,
         companyName: data.companyName,
         description: data.description as any,
-        location: data.location,
+        latitude: data.latitude,
+        longitude: data.longitude,
         name: data.name,
         phoneNumber: data.phoneNumber,
         address: data.address,
@@ -49,13 +51,32 @@ export class AuthService {
       }
      });
       return {
-        id: user.id,
+        userId: user.id,
         email:user.email,
-        petProviderProfile: providerProfile,
+        providerProfile: {
+          companyName: providerProfile.companyName,
+          description: providerProfile.description,
+          coordinates:{
+            latitude: providerProfile.latitude,
+            longitude: providerProfile.longitude,
+          },
+          admin: providerProfile.name,
+          phoneNumber: providerProfile.phoneNumber,
+          address: providerProfile.address,
+          city: providerProfile.city,
+          uf: providerProfile.uf,
+          cep: providerProfile.cep,
+          cnpj: providerProfile.cnpj,
+          cpf: providerProfile.cpf,
+        },
       }
     });
 
-    return petProvider;    
+    return {
+      message: `${petProvider.providerProfile.companyName} registrado com sucesso!`,
+      data: petProvider,
+      status: HttpCode(HttpStatus.CREATED)
+    };    
   }
 
   async registerPetOwner(data: RegisterPetOwnerDto) {
@@ -97,6 +118,41 @@ export class AuthService {
     });
 
     return petOwner;
+  }
+
+  async registerAdmin(data: RegisterAdminDto) {
+
+     const existingUser = await this.prisma.user.findUnique({
+      where: { email: data.email },
+    });
+
+    if (existingUser) throw new ConflictException('Este e-mail já está cadastrado em nossa plataforma.');
+
+    const saltRounds = 10;
+    const hashedPassword = await bcrypt.hash(data.password, saltRounds);
+    
+    const newAdmin = await this.prisma.$transaction(async (tx) => {
+      const user = await tx.user.create({
+        data: {
+          email: data.email,
+          password: hashedPassword,
+          role: UserRole.ADMIN,
+        },
+      });
+      const adminProfile = await tx.admin.create({
+        data: {
+          userId: user.id,
+          name: data.name,
+        },
+      });
+      return {
+        id: user.id,
+        email: user.email,
+        adminProfile: adminProfile,
+      };
+    });
+
+    return newAdmin;
   }
 
   async login(data: LoginDto) {

@@ -10,10 +10,13 @@ export const UserRoleDecorator = createParamDecorator(
     // O 'role' foi anexado ao request.user pelo JwtStrategy
     const role = request.user?.role; 
 
+
+
     if (!role) {
         throw new Error('Role do usuário não encontrado no token JWT.');
     }
     
+    console.log('Role do usuário extraída:', role);
     return role;
   },
 );

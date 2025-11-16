@@ -3,6 +3,7 @@ import {
   NotFoundException,
   ForbiddenException,
   Logger,
+  BadRequestException,
 } from '@nestjs/common';
 import { UploadDto } from './dto/uploadDto';
 import { ConfigService } from '@nestjs/config';
@@ -115,7 +116,27 @@ export class StorageService {
     };
   }
 
-  async uploadGalleryImages(files: Array<UploadDto>, userId: number) {
+  async uploadGalleryImages(files: Array<UploadDto> | undefined, userId: number) {
+    // Validação básica dos arquivos recebidos
+    if (!files || !Array.isArray(files)) {
+      // Quando o interceptor não preenche o parâmetro 'files' este método pode receber undefined
+      // Retornamos um erro claro para o cliente indicando payload inválido
+      throw new BadRequestException('Nenhum arquivo recebido. Verifique o campo multipart/form-data (nome: files)');
+    }
+
+    if (files.length === 0) {
+      throw new BadRequestException('Nenhum arquivo enviado no campo files');
+    }
+
+    // Filtra eventuais arquivos inválidos (sem originalname ou buffer) para evitar crashes
+    const validFiles = files.filter((f) => f && typeof f.originalname === 'string' && f.buffer);
+    if (validFiles.length === 0) {
+      throw new BadRequestException('Arquivos inválidos. Cada arquivo deve conter originalname e buffer');
+    }
+
+    // Usa os arquivos validados daqui em diante
+    files = validFiles;
+
     let petProvider = await this.prismaService.petProvider.findUnique({
       where: { userId: userId },
       select: { id: true },
@@ -135,7 +156,7 @@ export class StorageService {
     for (let i = 0; i < files.length; i += CONCURRENCY) {
       const batch = files.slice(i, i + CONCURRENCY);
       const batchPromises = batch.map((file) => {
-        const fileExtension = file.originalname.split('.').pop();
+        const fileExtension = (file.originalname || '').split('.').pop();
         const uniqueFileName = `${uuid()}.${fileExtension}`;
         const path = `gallery/${actualProviderId}/${uniqueFileName}`;
 
@@ -152,12 +173,10 @@ export class StorageService {
       uploadedResults.push(...results);
     }
 
-    const successfulUploads = uploadedResults.filter((result) => !result.error);
-    if (successfulUploads.length !== files.length) {
+  const successfulUploads = uploadedResults.filter((result) => !result.error);
+  if (successfulUploads.length !== files.length) {
       // Se alguns uploads falharam, tente limpar quaisquer arquivos já enviados neste lote
-      const uploadedPaths = successfulUploads
-        .map((r) => r.data?.path)
-        .filter(Boolean);
+      const uploadedPaths = successfulUploads.map((r) => r.data?.path).filter(Boolean) as string[];
       if (uploadedPaths.length) {
         try {
           await this.supabaseCliente.storage

@@ -9,14 +9,21 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+enum StatusUser {
+  ACTIVE
+  INACTIVE
+  BLOCKED
 }
 
 enum UserRole{
   PET_OWNER
   PET_PROVIDER
   ADMIN
+  EMPLOYEE
 }
 
 model User {
@@ -26,9 +33,20 @@ model User {
   role UserRole @default(PET_OWNER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  status StatusUser @default(ACTIVE)
 
   petOnerProfile PetOwner?
   providerProfile PetProvider?
+  adminProfile Admin?
+  employeeProfile Employee?
+}
+
+model Admin {
+  id Int @id @default(autoincrement())
+  name String
+  avatarUrl String?
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)  
 }
 
 model PetOwner {
@@ -42,20 +60,34 @@ model PetOwner {
   cpf String?
   avatarUrl String?
   userId Int @unique
-  user User @relation(fields: [userId], references: [id])
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   appointments Appointment[]
   reviews Review[]
-  favoritesProviers PetProvider[] @relation("FavoriteProviders")
+  favoritesProviders PetProvider[] @relation("FavoriteProviders")
+  signatures Signatures[]
+  pets Pet[]
+  
+}
+
+model Employee {
+  id Int @id @default(autoincrement())
+  name String
+  avatarUrl String?
+  userId Int @unique
+  user User @relation(fields: [userId], references: [id])
+  petProviderId Int
+  petProvider PetProvider @relation(fields: [petProviderId], references: [id], onDelete: Cascade)
 }
 
 model PetProvider {
   id Int @id @default(autoincrement())
   companyName String
   description String
-  location String
+  latitude Float
+  longitude Float
   avatarUrl String?
-  name String
+  name String?
   phoneNumber String
   address String
   city String
@@ -64,14 +96,35 @@ model PetProvider {
   cnpj String?
   cpf String?
   userId Int @unique
-  user User @relation(fields: [userId], references: [id])
-
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
   services Service[]
+  
   appointments Appointment[]
   reviews Review[]
   favoritedBy PetOwner[] @relation("FavoriteProviders")
   images ProviderImage[]
+  employees Employee[]
+  subscriptions SubscriptionPlan[]
 }
+
+model Pet {
+  id Int @id @default(autoincrement())
+  name String
+  breed String
+  age Int
+  type PetType @default(DOG)
+  weight Decimal
+  height Decimal
+  ownerId Int
+  owner PetOwner @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+}
+
+enum PetType {
+  DOG
+  CAT
+  OTHER
+}
+
 
 model ServiceType {
   id Int @id @default(autoincrement())
@@ -84,13 +137,17 @@ model Service {
   id Int @id @default(autoincrement())
   name String
   description String
-  price Float
+  price Decimal
   durationMinutes Int
   providerId Int
-  provider PetProvider @relation(fields: [providerId], references: [id])
+  provider PetProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
   serviceTypeId Int
-  serviceType ServiceType @relation(fields: [serviceTypeId], references: [id])
+  serviceType ServiceType @relation(fields: [serviceTypeId], references: [id], onDelete: Cascade)
+  
+
   appointments Appointment[]
+  planServices PlanService[]
+  
 }
 
 enum AppointmentStatus {
@@ -101,37 +158,37 @@ enum AppointmentStatus {
 }
 
 model Appointment {
-  id              String               @id @default(uuid())
+  id Int @id @default(autoincrement())
   date            DateTime
   status          AppointmentStatus    @default(PENDING)
-  totalPrice      Float
+  totalPrice      Decimal
 
   providerId      Int
-  provider        PetProvider             @relation(fields: [providerId], references: [id])
+  provider        PetProvider             @relation(fields: [providerId], references: [id], onDelete: Cascade)
   
   petOwnerId      Int
-  petOwner        PetOwner             @relation(fields: [petOwnerId], references: [id])
+  petOwner        PetOwner             @relation(fields: [petOwnerId], references: [id], onDelete: Cascade)
   
   serviceId       Int
-  service         Service              @relation(fields: [serviceId], references: [id])
+  service         Service              @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   
   review          Review?
 }
 
 model Review {
-  id              String         @id @default(uuid())
+   id Int @id @default(autoincrement())
   rating          Int            // 1 a 5 estrelas
   comment         String?
   createdAt       DateTime       @default(now())
 
-  appointmentId   String         @unique
+  appointmentId   Int         @unique
   appointment     Appointment    @relation(fields: [appointmentId], references: [id])
   
   petOwnerId      Int
-  petOwner        PetOwner       @relation(fields: [petOwnerId], references: [id])
+  petOwner        PetOwner       @relation(fields: [petOwnerId], references: [id], onDelete: Cascade)
   
   providerId      Int
-  provider        PetProvider       @relation(fields: [providerId], references: [id])
+  provider        PetProvider       @relation(fields: [providerId], references: [id], onDelete: Cascade)
 }
 
 model ProviderImage {
@@ -140,8 +197,65 @@ model ProviderImage {
   altText String?
   isCover Boolean @default(false)
   createdAt DateTime @default(now())
-  providerId Int
-  provider PetProvider @relation(fields: [providerId], references: [id])
+  providerId Int 
+  provider PetProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
 }
+
+model SubscriptionPlan {
+   id Int @id @default(autoincrement())
+   name String
+   description String
+   price Decimal
+   durationMonths Int
+   recurrence Recurrence
+   
+   
+   providerId Int
+   provider PetProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
+   planServices PlanService[]
+   signatures Signatures[]
+
+}
+
+enum Recurrence {
+  MONTHLY
+  QUARTERLY
+  YEARLY
+}
+
+model PlanService {
+  
+  planId Int
+  serviceId Int
+
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+  @@id([planId, serviceId])
+ 
+}
+
+model Signatures {
+  id Int @id @default(autoincrement())  
+  ownerId Int
+  planId Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status StatusSignatures @default(PENDING)
+  nextBillingDate DateTime
+  paymentGatewayId String
+  owner PetOwner @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  plan SubscriptionPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+}
+
+enum StatusSignatures {
+  PENDING
+  ACCEPTED
+  REJECTED
+  CANCELLED
+  PAST_DUE
+  EXPIRED
+}
+
+
 
 
