@@ -1,4 +1,4 @@
-import { ConflictException, ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ConflictException, ForbiddenException, HttpCode, HttpStatus, Injectable, UnauthorizedException } from '@nestjs/common';
 import { RegisterPetProviderDto } from '../auth/dto/RegisterPetProviderDto';
 import { PrismaService } from '../prisma/prisma.service';
 import { UserRole } from '@prisma/client';
@@ -38,7 +38,8 @@ export class AuthService {
         userId: user.id,
         companyName: data.companyName,
         description: data.description as any,
-        location: data.location,
+        latitude: data.latitude,
+        longitude: data.longitude,
         name: data.name,
         phoneNumber: data.phoneNumber,
         address: data.address,
@@ -50,13 +51,32 @@ export class AuthService {
       }
      });
       return {
-        id: user.id,
+        userId: user.id,
         email:user.email,
-        petProviderProfile: providerProfile,
+        providerProfile: {
+          companyName: providerProfile.companyName,
+          description: providerProfile.description,
+          coordinates:{
+            latitude: providerProfile.latitude,
+            longitude: providerProfile.longitude,
+          },
+          admin: providerProfile.name,
+          phoneNumber: providerProfile.phoneNumber,
+          address: providerProfile.address,
+          city: providerProfile.city,
+          uf: providerProfile.uf,
+          cep: providerProfile.cep,
+          cnpj: providerProfile.cnpj,
+          cpf: providerProfile.cpf,
+        },
       }
     });
 
-    return petProvider;    
+    return {
+      message: `${petProvider.providerProfile.companyName} registrado com sucesso!`,
+      data: petProvider,
+      status: HttpCode(HttpStatus.CREATED)
+    };    
   }
 
   async registerPetOwner(data: RegisterPetOwnerDto) {

@@ -14,12 +14,7 @@ export class AuthController {
     @HttpCode(HttpStatus.CREATED)
     async registerPetProvider(@Body() data: RegisterPetProviderDto){
         const newProvider = await this.authService.registerPetProvider(data);
-        return {
-            message: 'Prestador de serviços cadastrado com sucesso',
-            data: newProvider,
-            error: false,
-            statusCode: HttpStatus.CREATED
-        }
+        return newProvider
     }
 
     @Post('cadastro-tutor')

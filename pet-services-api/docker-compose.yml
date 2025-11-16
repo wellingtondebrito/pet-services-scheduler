@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  # O serviço do seu banco de dados
+  db:
+    image: postgis/postgis:16-3.4 # 💡 Recomendamos a versão mais recente do Postgres com a tag 'alpine' (imagem menor)
+    container_name: pet_scheduler_db
+    restart: always
+    ports:
+      # Mapeia a porta interna 5432 para a porta externa 5432 do seu host
+      - "5432:5432" 
+    environment:
+      # Variáveis de ambiente que o contêiner do Postgres usa
+      POSTGRES_USER: user_name
+      POSTGRES_PASSWORD: strong_password
+      POSTGRES_DB: pet_scheduler_db # 💡 Nome do seu banco de dados
+    volumes:
+      # Persiste os dados em um volume local para que eles não sejam perdidos ao parar o contêiner
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
