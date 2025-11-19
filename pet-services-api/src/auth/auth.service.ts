@@ -168,12 +168,43 @@ export class AuthService {
 
   async validateUser(email: string, password: string): Promise<any> {
     const user = await this.prisma.user.findUnique({
-      where: { email: email },
+      where: { email: email},
     });
     
     if (!user) {
       throw new UnauthorizedException('Usuário não encontrado');
     }
+
+    const now = new Date();
+    const GRACE_PERIOD_MS = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+
+    if(user.status === 'INACTIVE' && user.deletedAt){
+      const elapsedTime = now.getTime() - user.deletedAt.getTime();
+      if(elapsedTime < GRACE_PERIOD_MS){
+        await this.prisma.user.update({
+          where: {
+            id: user.id,
+          },
+          data: {
+            status: 'ACTIVE',
+            deletedAt: null,
+          },
+        })
+      }
+      else {
+        throw new ForbiddenException('Conta temporariamente desativada');
+      }
+   
+    }
+
+     if(user.status === 'BLOCKED'){
+      throw new ForbiddenException('Conta bloqueada');
+    }
+
+    if(!user.password){
+      throw new UnauthorizedException('Usuário não possui senha');
+    }
+     
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!passwordValid) {
       throw new UnauthorizedException('Senha inválida');

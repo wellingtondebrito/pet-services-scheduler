@@ -1,10 +1,15 @@
-import { IsOptional, IsPhoneNumber, IsString } from "class-validator";
+import { IsEmail, IsOptional, IsPhoneNumber, IsString } from "class-validator";
 import { IsCpfOrCnpj } from "src/common/validator/is-cpf-cnpj.decorator";
 
 export class UpdatedPetProviderDto {
     @IsString()
     @IsOptional()
     companyName?: string;
+
+    @IsString()
+    @IsOptional()
+    @IsEmail()
+    email?: string;
 
     @IsString()
     @IsOptional()

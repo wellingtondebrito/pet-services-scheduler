@@ -3,12 +3,12 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { Prisma, UserRole } from '@prisma/client';
+import { Prisma, StatusUser, UserRole } from '@prisma/client';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { UpdatedPetProviderDto } from './dto/updatedPetProvider.dto';
 import { ConfigService } from '@nestjs/config';
-import { cnpj } from 'cpf-cnpj-validator';
+
 
 @Injectable()
 export class PetProvidersService {
@@ -171,7 +171,14 @@ export class PetProvidersService {
 
     const updatedProvider = await this.prismaService.petProvider.update({
       where: { id: providerId },
-      data,
+      data: {
+        ... data, user: {
+          update: {
+            updatedAt: new Date(),
+            email: data.email
+          }
+        }
+      }
     });
 
     return {
@@ -220,29 +227,27 @@ export class PetProvidersService {
       throw new NotFoundException('Prestador não encontrado');
 
     // 2. CHECAGEM DE AUTORIZAÇÃO (Segundo passo crucial)
-    const isOwner = targetProvider.userId === userId;
+    const isProvider = targetProvider.userId === userId;
 
-    if (role !== UserRole.ADMIN && !isOwner)
+    if (role !== UserRole.ADMIN && !isProvider)
       throw new UnauthorizedException(
         'Você não tem permissão para acessar esta rota',
       );
+      
+      await this.prismaService.user.update({
+        where: { id: targetProvider.userId },data:{
+          status: StatusUser.INACTIVE,
+          deletedAt: new Date(),
+  
+        }
+      });
+
 
     // 3. LIMPEZA DO SUPABASE (Apenas após a autorização)
     await this.deleteProviderStorage(targetProvider as any); // Tipagem provisória
 
-
-    // 4. DELEÇÃO NO PRISMA
-    // Deletar PetProvider e o usuário principal (Regra de Negócio: Hard Delete)
-    await this.prismaService.petProvider.delete({
-      where: { id: providerId },
-    });
-
-    await this.prismaService.user.delete({
-      where: { id: targetProvider.userId },
-    });
-
     return {
-      message: 'Prestador deletado com sucesso',
+      message: 'Prestador temporariamente desativado com sucesso',
     };
   }
 
@@ -384,4 +389,262 @@ export class PetProvidersService {
     })),
   };
 }
+ async findClients(userId: number) {
+
+  const  providerProfile = await this.prismaService.petProvider.findUnique({
+    where: { userId: userId },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!providerProfile) {
+    throw new NotFoundException('Prestador não encontrado');
+  }
+
+  const providerId = providerProfile.id;
+
+
+    const uniqueOwnersId = await this.prismaService.appointment.groupBy({
+      by:['petOwnerId'],
+      where:{
+        petOwnerId: providerId,
+        petOwner: {NOT: undefined }
+      }
+    })
+
+    const ownerIds = uniqueOwnersId.map(appointment => appointment.petOwnerId)
+
+    if(ownerIds.length === 0) {
+      return {
+        message: 'Nenhum cliente encontrado',
+        data: [],
+        status: 200,
+      }
+    }
+
+    const clients = await this.prismaService.petOwner.findMany({
+      where: {
+        id: {
+          in: ownerIds
+        }
+      },
+      select: {
+        id: true,
+        name: true,
+        avatarUrl: true,
+        address: true,
+        city: true,
+        uf: true,
+        cep: true,
+        phoneNumber: true,
+        cpf: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+          },
+        },
+        pets:{
+          select:{
+            id: true,
+            name: true,
+            age: true,
+            type: true,
+            breed: true,
+            height: true,
+            weight: true,
+          }
+        }
+      },
+    });
+
+    return clients;
+  }
+
+  async findPetProviderById(providerId: number) {
+    const providerProfile = await this.prismaService.petProvider.findUnique({
+      where: { id: providerId },
+      select: {
+        id: true,
+        companyName: true,
+        phoneNumber: true,
+        address: true,
+        name: true,
+        cep: true,
+        city: true,
+        uf: true,
+        cnpj: true,
+        cpf: true,
+        latitude: true,
+        longitude: true,
+        avatarUrl: true,
+        description: true,
+        reviews: true,
+        images: true,
+        services: true,
+      },
+    });
+    return {
+      messge: 'Prestador encontrado com sucesso',
+      data: { 
+        id: providerProfile?.id,
+        companyName: providerProfile?.companyName,
+        phoneNumber: providerProfile?.phoneNumber,
+        coordinates: {
+          latitude: providerProfile?.latitude,
+          longitude: providerProfile?.longitude,
+        },        
+        address: providerProfile?.address,
+        city: providerProfile?.city,
+        uf: providerProfile?.uf,
+        cep: providerProfile?.cep,
+        avatarUrl: providerProfile?.avatarUrl,
+        description: providerProfile?.description,
+        reviews: providerProfile?.reviews,
+        images: providerProfile?.images,
+        services: providerProfile?.services,
+        cnpj: providerProfile?.cnpj,
+        cpf: providerProfile?.cpf,
+      },
+        
+      status: 200,
+    }
+       
+  }
+
+  async findAppointmentS(userId: number){
+
+    const providerProfile = await this.prismaService.petProvider.findUnique({
+      where: { userId: userId },
+     select:{id: true,}
+    });
+
+    if(!providerProfile){
+      throw new NotFoundException('Prestador não encontrado');    
+    }
+
+    const appointments = await this.prismaService.appointment.findMany({
+      where: {providerId: providerProfile.id},
+      select:{
+        id: true,
+        date: true,
+        service: true,
+        totalPrice: true,        
+        status: true,
+        pet:{
+          select:{
+            id: true,
+            name: true,
+            type: true,
+            breed: true,
+            age: true,
+            height: true,
+            weight: true,
+          }
+        },
+        petOwner: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+            phoneNumber: true,}
+      },
+    }
+    })
+
+    if(appointments.length === 0){
+      return {
+        message: 'Nenhum agendamento encontrado',
+        data: [],
+        status: 200,
+      }
+    }
+
+    return {
+      message: 'Agendamentos encontrados com sucesso',
+      data: appointments,
+      status: 200,
+    }
+
+  }
+
+  async findReviews(userId: number) {
+    const providerProfile = await this.prismaService.petProvider.findUnique({
+      where: { userId: userId },
+     select:{id: true,}
+    });
+
+    if(!providerProfile){
+      throw new NotFoundException('Prestador não encontrado');    
+    }
+
+    const reviews = await this.prismaService.review.findMany({
+      where: {providerId: providerProfile.id},
+      select:{
+        id: true,
+        rating: true,
+        comment: true,
+        petOwner: {
+          select: {
+            id: true,
+            name: true,
+            avatarUrl: true,
+          }
+        }
+      }
+    })
+
+    if(reviews.length === 0){
+      return {
+        message: 'Nenhuma avaliação encontrada',
+        data: [],
+        status: 200,
+      }
+    }
+    
+    return {
+      message: 'Avaliações encontradas com sucesso',
+      data: reviews,
+      status: 200,
+    }
+  
+  }
+
+  async findImages(userId: number) {
+
+    const providerProfile = await this.prismaService.petProvider.findUnique({
+      where: { userId: userId },
+     select:{id: true,}
+    });
+
+    if(!providerProfile) throw new NotFoundException('Prestador não encontrado');    
+
+    const images = await this.prismaService.providerImage.findMany({
+      where: {providerId: providerProfile.id},      select:{
+        id: true,
+        url: true,
+        altText: true,
+        isCover: true,
+        createdAt: true,           
+      }
+    })
+
+    if(images.length === 0){
+      return {
+        message: 'Nenhuma imagem encontrada',
+        data: [],
+        status: 200,
+      }
+    }
+
+    return {
+      message: 'Imagens encontradas com sucesso',
+      data: images,
+      status: 200,
+    }
+
+  }
+
+
 }
