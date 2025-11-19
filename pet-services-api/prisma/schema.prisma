@@ -17,6 +17,9 @@ enum StatusUser {
   ACTIVE
   INACTIVE
   BLOCKED
+  DELETED
+  PENDING_VERIFICATION
+  PENDING_RESET_PASSWORD
 }
 
 enum UserRole{
@@ -29,11 +32,15 @@ enum UserRole{
 model User {
   id Int @id @default(autoincrement())
   email String @unique
-  password String
+  password String?
+  resetToken String?
+  resetTokenExpiresAt DateTime?
   role UserRole @default(PET_OWNER)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   status StatusUser @default(ACTIVE)
+  deletedAt DateTime?
+  
 
   petOnerProfile PetOwner?
   providerProfile PetProvider?
@@ -64,7 +71,7 @@ model PetOwner {
 
   appointments Appointment[]
   reviews Review[]
-  favoritesProviders PetProvider[] @relation("FavoriteProviders")
+  favoritesProviders FavoriteProviders[]
   signatures Signatures[]
   pets Pet[]
   
@@ -101,7 +108,7 @@ model PetProvider {
   
   appointments Appointment[]
   reviews Review[]
-  favoritedBy PetOwner[] @relation("FavoriteProviders")
+  favoritedBy FavoriteProviders[]
   images ProviderImage[]
   employees Employee[]
   subscriptions SubscriptionPlan[]
@@ -117,6 +124,9 @@ model Pet {
   height Decimal
   ownerId Int
   owner PetOwner @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  appointments Appointment[]
+
 }
 
 enum PetType {
@@ -143,6 +153,7 @@ model Service {
   provider PetProvider @relation(fields: [providerId], references: [id], onDelete: Cascade)
   serviceTypeId Int
   serviceType ServiceType @relation(fields: [serviceTypeId], references: [id], onDelete: Cascade)
+  
   
 
   appointments Appointment[]
@@ -173,6 +184,8 @@ model Appointment {
   service         Service              @relation(fields: [serviceId], references: [id], onDelete: Cascade)
   
   review          Review?
+  petId Int
+  pet Pet @relation(fields: [petId], references: [id], onDelete: Cascade)
 }
 
 model Review {
@@ -254,6 +267,20 @@ enum StatusSignatures {
   CANCELLED
   PAST_DUE
   EXPIRED
+}
+
+model FavoriteProviders {
+  id Int @id @default(autoincrement())
+  petOwnerId Int
+  owner PetOwner @relation(fields: [petOwnerId], references: [id], onDelete: Cascade)
+  petProviderId Int
+  providers PetProvider @relation(fields: [petProviderId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  deletedAt DateTime?
+
+  @@unique([petOwnerId, petProviderId])
 }
 
 

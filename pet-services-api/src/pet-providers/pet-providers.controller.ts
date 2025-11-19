@@ -41,7 +41,61 @@ export class PetProvidersController {
     return result;
   }
 
-  @Patch(':providerId')
+ 
+  @Get('search/localizacao')
+  @HttpCode(HttpStatus.OK)
+  async findProviderByCoordinates(
+    // Com a ValidationPipe global configurada com transformOptions.enableImplicitConversion = true
+    // podemos receber diretamente números (ex: ?latitude=-26.3) e o Nest fará a conversão automaticamente
+    @Query() coordinates: CoordinatesDto,
+  ): Promise<any> {
+    const result = await this.petProvidersService.findProviderByCoordinates(
+      coordinates.latitude,
+      coordinates.longitude,
+    );
+    return result;
+  }
+
+  @Get('meus-clientes')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.PET_PROVIDER)
+  @UseGuards(AuthGuard('jwt'))
+  async findClients(@UserId() providerId: number) {
+    const result = await this.petProvidersService.findClients(providerId);
+    return result;
+  }
+
+  @Get('galeria-imagens')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.PET_PROVIDER)
+  @UseGuards(AuthGuard('jwt'))
+  async findImages(@UserId() providerId: number) {
+    const result =
+      await this.petProvidersService.findImages(providerId);
+    return result;
+  }
+
+   @Get('agendamentos')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.PET_PROVIDER)
+  @UseGuards(AuthGuard('jwt'))
+  async findAppointments(@UserId() providerId: number) {
+    const result =
+      await this.petProvidersService.findAppointmentS(providerId);
+    return result;
+  }
+  // ROTAS ESTATICAS COM NOMES FIXOS SEMPRE DEVEM SER DEFINIDOS ANTES DAS ROTAS PARAMÉTRICAS(:id)
+  @Get('avaliacoes')
+  @HttpCode(HttpStatus.OK)
+  @Roles(UserRole.PET_PROVIDER)
+  @UseGuards(AuthGuard('jwt'))
+  async findReviews(@UserId() providerId: number) {
+    const result =
+      await this.petProvidersService.findReviews(providerId);
+    return result;
+  }
+
+   @Patch(':providerId')
   @HttpCode(HttpStatus.OK)
   @Roles(UserRole.ADMIN, UserRole.PET_PROVIDER)
   @UseGuards(AuthGuard('jwt'), RolesGuard)
@@ -77,19 +131,14 @@ export class PetProvidersController {
     return result;
   }
 
-  @Get('search/localizacao')
+
+  @Get(':providerId')
   @HttpCode(HttpStatus.OK)
-  async findProviderByCoordinates(
-    // Com a ValidationPipe global configurada com transformOptions.enableImplicitConversion = true
-    // podemos receber diretamente números (ex: ?latitude=-26.3) e o Nest fará a conversão automaticamente
-    @Query() coordinates: CoordinatesDto
-  ): Promise<any> {
-
-
-    const result = await this.petProvidersService.findProviderByCoordinates(
-      coordinates.latitude,
-      coordinates.longitude,
-    );
+  async findPetProviderById(@Param('providerId') providerId: number) {
+    const result =
+      await this.petProvidersService.findPetProviderById(providerId);
     return result;
   }
+
+ 
 }

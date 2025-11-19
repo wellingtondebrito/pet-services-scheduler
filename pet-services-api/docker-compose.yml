@@ -18,5 +18,18 @@ services:
       # Persiste os dados em um volume local para que eles não sejam perdidos ao parar o contêiner
       - postgres_data:/var/lib/postgresql/data
 
+  redis:
+    image: redis:6.2-alpine # Usamos uma imagem leve
+    container_name: pet-services-redis
+    restart: always
+    ports:
+      - "6379:6379" # Mapeia a porta interna do container para a porta da sua máquina
+    command: redis-server --appendonly yes
+   # volumes:
+     # - redis_data:/data
+
 volumes:
   postgres_data:
+  redis_data:
+
+  
