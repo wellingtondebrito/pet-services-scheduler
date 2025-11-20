@@ -10,8 +10,6 @@ import {
   Card,
   CardContent,
   CardFooter,
-  CardHeader,
-  CardTitle,
 } from "@/components/ui/card";
 import {
   Form,
@@ -25,6 +23,7 @@ import { Input } from "@/components/ui/input";
 import { FaGoogle } from "react-icons/fa6";
 import { Separator } from "@/components/ui/separator";
 import Image from 'next/image'
+import Link from "next/link";
 
 export default function LoginPage() {
   const form = useForm<z.infer<typeof loginSchema>>({
@@ -128,12 +127,21 @@ export default function LoginPage() {
                     >
                       <FaGoogle className="text-violet-700 mr-2" /> Entre com google
                     </Button>
+                    <div className="flex flex-col w-full justify-between gap-2 md:flex-row ">
+                    <Button
+                      variant={"default"}
+                      className="text-purple-50 bg-purple-500  w-full h-11 border-purple-900 p-1.5 cursor-pointer md:w-1/2"
+                    >
+                      <Link href="/cadastro-tutor">Cadastrar como Tutor</Link>
+                    </Button>
                     <Button
                       variant={"outline"}
-                      className="text-purple-700 w-full h-11 border-purple-900 p-1.5 cursor-pointer"
+                      className="text-purple-700 w-full h-11 border-purple-500 p-1.5 cursor-pointer md:w-1/2"
                     >
-                      Cadastrar
+                      <Link href="/cadastro-prestador">Cadastrar como Prestador</Link>
                     </Button>
+
+                    </div>
                   </CardFooter>
                 </form>
               </Form>
