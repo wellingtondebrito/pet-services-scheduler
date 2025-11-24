@@ -10,41 +10,42 @@ import {
 import { Provider } from "@/data/mock-providers";
 import { MapPin, Star } from "lucide-react";
 import { FaStar } from "react-icons/fa";
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
+import Link from "next/link";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 interface ProviderCardProps {
   provider: Provider;
 }
 
 export function ProviderCard({ provider }: ProviderCardProps) {
-
-    const formatCurrency = (value: number) => {
+  const formatCurrency = (value: number) => {
     return value.toLocaleString("pt-BR", {
       style: "currency",
       currency: "BRL",
     });
   };
 
-
   return (
     <Card className="shadow-sm p-4 gap-4 transition-shadow">
       <CardHeader className="flex flex-row items-center p-0 pr-4">
-        <Image
-          src="/avatar.jpg"
-          alt={provider.companyName}
-          width={60}
-          height={60}
-          className="rounded-full mr-4"
-        />
-       <div className="flex flex-col justify-center">
-          <CardTitle className="text-lg font-bold p-0 text-purple-950">{provider.companyName}</CardTitle>
+        <Avatar className="w-16 h-16">
+          <AvatarImage src={provider.avatarProvider} alt="@shadcn" />
+          <AvatarFallback>CN</AvatarFallback>
+        </Avatar>
+        <div className="flex flex-col justify-center">
+          <CardTitle className="text-lg font-bold p-0 text-purple-950">
+            {provider.companyName}
+          </CardTitle>
           <p className="text-sm text-gray-600 font-medium">
-             {provider.providerType}
+            {provider.providerType}
           </p>
         </div>
       </CardHeader>
-      <CardDescription className="flex-1 space-y-1 text-gray-900">{provider.description}</CardDescription>
+      <CardDescription className="flex-1 space-y-1 text-gray-900">
+        {provider.description}
+      </CardDescription>
       <CardContent className="flex-1 flex-col space-y-1 gap-8">
         <div className="flex flex-row gap-2 mb-1">
           <MapPin className="h-5 w-5 text-purple-500" />
@@ -54,16 +55,19 @@ export function ProviderCard({ provider }: ProviderCardProps) {
           </p>
         </div>
         <div className="flex flex-row gap-2 mt-2">
-            <FaStar className="text-yellow-500 h-5 w-5"/>
-            <p className="text-purple-900">{provider.rating}</p>
+          <FaStar className="text-yellow-500 h-5 w-5" />
+          <p className="text-purple-900">{provider.rating}</p>
         </div>
-         <div className="flex flex-row gap-2 mt-2">
-            <Badge className="text-purple-100 p-1 rounded-lg pl-2 pr-2 bg-purple-500">A patir de {formatCurrency(provider.averagePrice)}</Badge>
+        <div className="flex flex-row gap-2 mt-2">
+          <Badge className="text-purple-100 p-1 rounded-lg pl-2 pr-2 bg-purple-500">
+            A patir de {formatCurrency(provider.averagePrice)}
+          </Badge>
         </div>
       </CardContent>
       <CardFooter className="flex-1 space-y-1 justify-end">
-        
-        <Button className="bg-purple-700">Ver detalhes</Button>
+        <Button className="bg-purple-700 hover:bg-purple-600">
+          <Link href={`/perfil-prestador/${provider.id}`}>Ver Perfil</Link>
+        </Button>
       </CardFooter>
     </Card>
   );

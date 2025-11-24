@@ -3,24 +3,27 @@
 // --- Tipos para Arrays Aninhados ---
 
 export type Service = {
+  id: number;
   name: string;
   price: number;
   duration: string; // Ex: "1h", "24h", "8h"
 };
 
 export type Review = {
+  id: number;
   name: string;
   avatar: string; // URL
   review: string;
   rating: number; // 4.1, 5.0, etc.
 };
 
-export type SubscriptionPlan = {
+export interface SubscriptionPlan {
+  id: number;
   planName: string;
   value: string; // Manter como string "R$130.00/mês" para fins de mock
   services: string;
   benefits: string;
-};
+}
 
 // --- Tipos para Objetos Aninhados ---
 
