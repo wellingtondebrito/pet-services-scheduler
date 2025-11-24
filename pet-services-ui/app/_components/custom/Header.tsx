@@ -10,7 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
 const navLinks = [
-  { href: '/search', label: 'Buscar Serviços' },
+  { href: '/busca-prestador', label: 'Buscar Serviços' },
   { href: '/como-funciona', label: 'Como Funciona' },
   { href: '/prestador', label: 'Quero ser Prestador' },
 ];
