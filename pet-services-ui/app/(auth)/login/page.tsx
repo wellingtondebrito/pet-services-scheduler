@@ -3,7 +3,6 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginSchema } from "../schema/loginSchema";
 import * as z from "zod";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,9 +23,13 @@ import { FaGoogle } from "react-icons/fa6";
 import { Separator } from "@/components/ui/separator";
 import Image from 'next/image'
 import Link from "next/link";
+import { LoginValues, loginSchema } from "@/schemas/authSchemas";
+import { useAuthStore } from "@/store/useAuthStore";
+import { useRouter } from "next/navigation";
+
 
 export default function LoginPage() {
-  const form = useForm<z.infer<typeof loginSchema>>({
+  const form = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
     mode: "onBlur",
     defaultValues: {
@@ -35,10 +38,20 @@ export default function LoginPage() {
     },
   });
 
+
+  const router = useRouter();
+  const login = useAuthStore((state) => state.login);
+  const isLoading = useAuthStore((state) => state.isLoading);
   
 
-  async function onSubmit(data: z.infer<typeof loginSchema>) {
-    console.log(data);
+  async function onSubmit(data: LoginValues) {
+    try{
+      login(data)
+      form.reset()
+      router.push('/busca-prestador')
+    }catch(error){
+      console.log(error);
+    }
     // O retorno implícito de 'Promise<void>' satisfaz o TypeScript
   }
 
@@ -75,10 +88,10 @@ export default function LoginPage() {
                         </FormLabel>
                         <FormControl>
                           <Input
+                            {...field}
                             className="h-11 w-full"
                             placeholder="Digite o seu e-mail"
                             id="email"
-                            {...field}
                           />
                         </FormControl>
                         <FormMessage />
@@ -95,11 +108,11 @@ export default function LoginPage() {
                         </FormLabel>
                         <FormControl>
                           <Input
+                            {...field}
                             className="w-full h-11"
                             type="password"
                             placeholder="Digite a sua senha"
                             id="password"
-                            {...field}
                           />
                         </FormControl>
                         <FormMessage />

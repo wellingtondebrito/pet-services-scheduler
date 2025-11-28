@@ -44,7 +44,7 @@ export default function OwnerLandingPage() {
                 <Input
                   id="search"
                   name="search"
-                  value=""
+                  value="find"
                   type="text"
                   placeholder="Busque por cidade ou CEP"
                   className="flex-1 border-none focus:ring-0 text-base h-12 px-4 justify-center items-center"

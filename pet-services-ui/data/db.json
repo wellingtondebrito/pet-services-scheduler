@@ -1,0 +1,451 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "email": "joao.dono@email.com",
+      "password": "hashed_password_1",
+      "fullName": "João Silva Dono",
+      "role": "PET_OWNER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:00:00Z",
+      "updatedAt": "2025-11-20T10:00:00Z"
+    },
+    {
+      "id": "2",
+      "email": "maria.prestadora@email.com",
+      "password": "hashed_password_2",
+      "fullName": "Maria Souza PetCare",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:05:00Z",
+      "updatedAt": "2025-11-20T10:05:00Z"
+    },
+    {
+      "id": "3",
+      "email": "ana.admin@email.com",
+      "password": "hashed_password_3",
+      "fullName": "Ana Paula Admin",
+      "role": "ADMIN",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:10:00Z",
+      "updatedAt": "2025-11-20T10:10:00Z"
+    },
+    {
+      "id": "4",
+      "email": "pedro.empregado@email.com",
+      "password": "hashed_password_4",
+      "fullName": "Pedro Empregado",
+      "role": "EMPLOYEE",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:15:00Z",
+      "updatedAt": "2025-11-20T10:15:00Z"
+    },
+    {
+      "id": "5",
+      "email": "provider2@email.com",
+      "password": "hashed_password_5",
+      "fullName": "Clínica Veterinária Alfa",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:20:00Z",
+      "updatedAt": "2025-11-20T10:20:00Z"
+    },
+    {
+      "id": "6",
+      "email": "provider3@email.com",
+      "password": "hashed_password_6",
+      "fullName": "Dog Walker do Zeca",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:25:00Z",
+      "updatedAt": "2025-11-20T10:25:00Z"
+    },
+    {
+      "id": "7",
+      "email": "provider4@email.com",
+      "password": "hashed_password_7",
+      "fullName": "Gato & Cia Hospedagem",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:30:00Z",
+      "updatedAt": "2025-11-20T10:30:00Z"
+    },
+    {
+      "id": "8",
+      "email": "provider5@email.com",
+      "password": "hashed_password_8",
+      "fullName": "Bicho Feliz Pet Shop",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:35:00Z",
+      "updatedAt": "2025-11-20T10:35:00Z"
+    },
+    {
+      "id": "9",
+      "email": "provider6@email.com",
+      "password": "hashed_password_9",
+      "fullName": "Adestramento Canino",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:40:00Z",
+      "updatedAt": "2025-11-20T10:40:00Z"
+    },
+    {
+      "id": "10",
+      "email": "provider7@email.com",
+      "password": "hashed_password_10",
+      "fullName": "Taxi Pet Veloz",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:45:00Z",
+      "updatedAt": "2025-11-20T10:45:00Z"
+    },
+    {
+      "id": "11",
+      "email": "provider8@email.com",
+      "password": "hashed_password_11",
+      "fullName": "Estética Animal Luxo",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:50:00Z",
+      "updatedAt": "2025-11-20T10:50:00Z"
+    },
+    {
+      "id": "12",
+      "email": "provider9@email.com",
+      "password": "hashed_password_12",
+      "fullName": "Reino dos Roedores",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T10:55:00Z",
+      "updatedAt": "2025-11-20T10:55:00Z"
+    },
+    {
+      "id": "13",
+      "email": "provider10@email.com",
+      "password": "hashed_password_13",
+      "fullName": "Acupuntura Pet",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-20T11:00:00Z",
+      "updatedAt": "2025-11-20T11:00:00Z"
+    },
+    {
+      "id": "17dd",
+      "email": "wellington@email.com",
+      "password": "123Mudar@",
+      "fullName": "Wellington de Brito Souza",
+      "role": "PET_OWNER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-25T13:36:31.479Z",
+      "updatedAt": "2025-11-25T13:36:31.480Z"
+    },
+    {
+      "id": "6e3e",
+      "email": "contato@petcaozinhofeliz.com",
+      "password": "123Mudar",
+      "fullName": "Luisa Perez ",
+      "role": "PET_PROVIDER",
+      "status": "ACTIVE",
+      "createdAt": "2025-11-25T17:52:23.372Z",
+      "updatedAt": "2025-11-25T17:52:23.372Z"
+    }
+  ],
+  "admins": [
+    {
+      "id": "1",
+      "name": "Ana Paula Admin",
+      "avatarUrl": "https://placehold.co/150x150/0000FF/FFFFFF?text=A",
+      "userId": 3
+    }
+  ],
+  "petOwners": [
+    {
+      "id": "1",
+      "name": "João Silva Dono",
+      "phoneNumber": "1199887766",
+      "address": "Rua das Flores, 100",
+      "city": "São Paulo",
+      "uf": "SP",
+      "cep": "01000-000",
+      "cpf": "12345678900",
+      "avatarUrl": "https://placehold.co/150x150/8B4513/FFFFFF?text=JD",
+      "userId": 1
+    },
+    {
+      "id": "51d9",
+      "name": "Wellington de Brito Souza",
+      "userId": "17dd",
+      "phoneNumber": "47991029237",
+      "address": "Rua Joaquim Nabuco, 81",
+      "city": "Joinville",
+      "uf": "SC",
+      "cep": "89203-404",
+      "cpf": "116.781.407-08"
+    }
+  ],
+  "petProviders": [
+    {
+      "id": "1",
+      "companyName": "Cantinho Pet da Maria",
+      "description": "Serviços de banho, tosa e creche com muito carinho.",
+      "latitude": -23.55052,
+      "longitude": -46.6333,
+      "avatarUrl": "https://placehold.co/150x150/FFD700/000000?text=MP",
+      "name": "Maria Souza",
+      "phoneNumber": "1155554444",
+      "address": "Av. Principal, 500",
+      "city": "São Paulo",
+      "uf": "SP",
+      "cep": "01001-000",
+      "cnpj": "12345678000190",
+      "userId": 2
+    }
+  ],
+  "employees": [
+    {
+      "id": "1",
+      "name": "Pedro Empregado",
+      "avatarUrl": "https://placehold.co/150x150/008000/FFFFFF?text=PE",
+      "userId": 4,
+      "petProviderId": 1
+    }
+  ],
+  "pets": [
+    {
+      "id": "1",
+      "name": "Rex",
+      "breed": "Golden Retriever",
+      "age": 3,
+      "type": "DOG",
+      "weight": 30.5,
+      "height": 60,
+      "ownerId": 1
+    }
+  ],
+  "serviceTypes": [
+    {
+      "id": "1",
+      "name": "Banho e Tosa"
+    },
+    {
+      "id": "2",
+      "name": "Hospedagem"
+    },
+    {
+      "id": "3",
+      "name": "Creche"
+    },
+    {
+      "id": "4",
+      "name": "Pet Shop"
+    },
+    {
+      "id": "5",
+      "name": "Veterinária"
+    },
+    {
+      "id": "6",
+      "name": "Dog Walker"
+    },
+    {
+      "id": "7",
+      "name": "Adestramento"
+    }
+  ],
+  "services": [
+    {
+      "id": "1",
+      "name": "Banho Completo (Cães Pequenos)",
+      "description": "Banho com shampoo hipoalergênico e secagem.",
+      "price": 50,
+      "durationMinutes": 60,
+      "petProviderId": "1",
+      "serviceTypeId": "1"
+    },
+     {
+      "id": "2",
+      "name": "Banho Completo (Cães Grandes)",
+      "description": "Banho com shampoo hipoalergênico e secagem.",
+      "price": 150,
+      "durationMinutes": 60,
+      "petProviderId": "1",
+      "serviceTypeId": "1"
+    }
+
+  ],
+  "appointments": [],
+  "reviews": [
+    {
+      "id": "1",
+      "rating": 5,
+      "name": "João Silva Dono",
+      "avatarUrl": "https://placehold.co/150x150/8B4513/FFFFFF?text=JD",
+      "comment": "Serviço excelente e atencioso!",
+      "createdAt": "2025-12-01T15:30:00Z",
+      "appointmentId": "1",
+      "petOwnerId": "1",
+      "petProviderId": "1"
+    }
+  ],
+  "providerImages": [
+    {
+      "id": "1",
+      "url": "https://placehold.co/600x400/ADD8E6/000000?text=MP+Fachada",
+      "altText": "Fachada do Cantinho Pet",
+      "isCover": true,
+      "petProviderId": "1"
+    },
+    {
+      "id": "2",
+      "url": "https://placehold.co/600x400/90EE90/000000?text=MP+Area+de+Lazer",
+      "altText": "Área de lazer para pets",
+      "isCover": false,
+      "petProviderId": "1"
+    },
+    {
+      "id": "3",
+      "url": "https://placehold.co/600x400/FF0000/FFFFFF?text=CV+Emergencia",
+      "altText": "Sinal de emergência da Clínica",
+      "isCover": true,
+      "petProviderId": "1"
+    },
+    {
+      "id": "4",
+      "url": "https://placehold.co/600x400/0000FF/FFFFFF?text=DW+Parque",
+      "altText": "Cães passeando no parque",
+      "isCover": true,
+      "petProviderId": "1"
+    }
+  ],
+  "subscriptionPlans": [
+    {
+      "id": "1",
+      "name": "Pet Básico",
+      "description": "Plano ideal para manter a higiene e saúde básica do seu pet com custo-benefício.",
+      "services": [
+        "Pet Shop",
+        "Veterinária"
+      ],
+      "benefits": [
+        "1 banho e tosa higiênica por mês",
+        "1 consulta veterinária de rotina anual (gratuita)",
+        "Desconto de 10% em todos os produtos da loja"
+      ],
+      "price": 79.90,
+      "durationMonths": 1,
+      "recurrence": "MONTHLY",
+      "petProviderId": "1"
+    },
+    {
+      "id": "2",
+      "name": "Saúde Total Trimestral",
+      "description": "Foco na prevenção e bem-estar, com serviços regulares de higiene e check-ups veterinários.",
+      "services": [
+        "Pet Shop",
+        "Veterinária"
+      ],
+      "benefits": [
+        "1 banho e tosa higiênica por mês (3 no trimestre)",
+        "1 consulta veterinária de rotina a cada 6 meses (2 no ano)",
+        "Vacina V8/V10 ou Tríplice Felina anual (exclusão da vacina da raiva)",
+        "Desconto de 15% em todos os serviços de Daycare e Hospedagem"
+      ],
+      "price": 199.00,
+      "durationMonths": 3,
+      "recurrence": "QUARTERLY",
+      "petProviderId": "1"
+    },
+    {
+      "id": "3",
+      "name": "Premium Plus",
+      "description": "O plano mais completo para cuidados de rotina, urgências e tratamentos especializados.",
+      "services": [
+        "Pet Shop",
+        "Veterinária"
+      ],
+      "benefits": [
+        "12 banhos e tosa higiênica (1 por mês)",
+        "Consultas veterinárias de rotina ilimitadas (sem custo extra)",
+        "Vacinação completa anual (V8/V10, Tríplice Felina e Raiva)",
+        "Desconto de 20% em exames laboratoriais e procedimentos cirúrgicos",
+        "Atendimento de urgência/emergência 24h (taxa de serviço reduzida)"
+      ],
+      "price": 999.00,
+      "durationMonths": 12,
+      "recurrence": "YEARLY",
+      "petProviderId": "1"
+    },
+    {
+      "id": "4",
+      "name": "Golden Sênior",
+      "description": "Serviço dedicado a pets idosos, com foco em monitoramento de saúde e conforto.",
+      "services": [
+        "Pet Shop",
+        "Veterinária",
+        "Especializado"
+      ],
+      "benefits": [
+        "1 banho e tosa higiênica especial para idosos por mês",
+        "1 check-up geriátrico completo a cada 4 meses",
+        "Entrega gratuita de medicamentos e rações (área de cobertura)",
+        "Acompanhamento nutricional especializado (1 sessão/trimestre)"
+      ],
+      "price": 149.90,
+      "durationMonths": 1,
+      "recurrence": "MONTHLY",
+      "petProviderId": "1"
+    }
+  ],
+  "planServices": [
+    {
+      "planId": 1,
+      "serviceId": 1,
+      "id": "3f71"
+    }
+  ],
+  "signatures": [
+    {
+      "id": "1",
+      "ownerId": 1,
+      "planId": 1,
+      "createdAt": "2025-11-20T10:30:00Z",
+      "updatedAt": "2025-11-20T10:30:00Z",
+      "status": "ACCEPTED",
+      "nextBillingDate": "2025-12-20T10:30:00Z",
+      "paymentGatewayId": "pg_123456"
+    }
+  ],
+  "favoriteProviders": [
+    {
+      "id": "1",
+      "petOwnerId": 1,
+      "petProviderId": 1,
+      "createdAt": "2025-11-21T08:00:00Z",
+      "updatedAt": "2025-11-21T08:00:00Z"
+    }
+  ],
+  "availabilities": [
+    {
+      "id": 102,
+      "dayOfWeek": "TUESDAY",
+      "startTime": "09:00",
+      "endTime": "18:00",
+      "petProviderId": "1" 
+    },
+    {
+      "id": 103,
+      "dayOfWeek": "WEDNESDAY",
+      "startTime": "09:00",
+      "endTime": "18:00",
+      "petProviderId": "1"
+    },
+     {
+      "id": 104,
+      "dayOfWeek": "THURSDAY",
+      "startTime": "09:00",
+      "endTime": "18:00",
+      "petProviderId": "1"
+    }
+  ]
+}

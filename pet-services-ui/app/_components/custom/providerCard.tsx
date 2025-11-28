@@ -14,9 +14,10 @@ import { Badge } from "@/components/ui/badge";
 import Image from "next/image";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { PetProvider } from "@/types/types";
 
 interface ProviderCardProps {
-  provider: Provider;
+  provider: PetProvider;
 }
 
 export function ProviderCard({ provider }: ProviderCardProps) {
@@ -31,7 +32,7 @@ export function ProviderCard({ provider }: ProviderCardProps) {
     <Card className="shadow-sm p-4 gap-4 transition-shadow">
       <CardHeader className="flex flex-row items-center p-0 pr-4">
         <Avatar className="w-16 h-16">
-          <AvatarImage src={provider.avatarProvider} alt="@shadcn" />
+          <AvatarImage src={provider.avatarUrl} alt="@shadcn" />
           <AvatarFallback>CN</AvatarFallback>
         </Avatar>
         <div className="flex flex-col justify-center">
@@ -39,7 +40,7 @@ export function ProviderCard({ provider }: ProviderCardProps) {
             {provider.companyName}
           </CardTitle>
           <p className="text-sm text-gray-600 font-medium">
-            {provider.providerType}
+            {provider.activity}
           </p>
         </div>
       </CardHeader>
@@ -50,8 +51,8 @@ export function ProviderCard({ provider }: ProviderCardProps) {
         <div className="flex flex-row gap-2 mb-1">
           <MapPin className="h-5 w-5 text-purple-500" />
           <p className="text-purple-900">
-            {provider.address.neighborhood}, {provider.address.number} -{" "}
-            {provider.address.city}, {provider.address.state}
+            {provider.address}, -{" "}
+            {provider.city}, {provider.uf}
           </p>
         </div>
         <div className="flex flex-row gap-2 mt-2">
@@ -60,7 +61,9 @@ export function ProviderCard({ provider }: ProviderCardProps) {
         </div>
         <div className="flex flex-row gap-2 mt-2">
           <Badge className="text-purple-100 p-1 rounded-lg pl-2 pr-2 bg-purple-500">
-            A patir de {formatCurrency(provider.averagePrice)}
+           {!provider.services?.[0]?.price ? "Preço minino não definido" : <>
+           A patir de {formatCurrency(provider.services?.[0]?.price)}
+           </>}
           </Badge>
         </div>
       </CardContent>
