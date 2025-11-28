@@ -25,7 +25,7 @@ export function Header() {
         {/* Logo */}
         <div className="mr-4 flex items-center">
           <Link href="/" className="flex items-center space-x-2">
-            <Image src="/logo-pet-me.png" alt="Pet.me Logo" width={130} height={130} />
+            <Image src="/logo-pet-me.png" alt="Pet.me Logo" width={130} height={130} priority />
           </Link>
         </div>
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { MOCK_PROVIDERS } from "@/data/MOCK_PROVIDERS";
+
 import { ProviderCard } from "./providerCard";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   Pagination,
@@ -13,10 +13,22 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
+import { useProviderStore } from "@/store/useProviderStore";
 
-const providers = MOCK_PROVIDERS;
+
+
 
 export default function ProviderResultsList() {
+
+  const {providers, isLoading, fetchAllProviders} = useProviderStore()
+
+
+  useEffect(() => {
+    if(providers.length ===0){
+      fetchAllProviders()
+    }
+  },[])
+
   const ITEMS_PER_PAGE = 4;
   const totalProviders = providers.length;
   const totalPages = Math.ceil(totalProviders / ITEMS_PER_PAGE);
@@ -25,6 +37,14 @@ export default function ProviderResultsList() {
   const endIndex = currentPage * ITEMS_PER_PAGE;
   const startIndex = endIndex - ITEMS_PER_PAGE;
   const currentProviders = providers.slice(startIndex, endIndex);
+
+  if (isLoading) {
+    return <div className="text-center text-xl p-8">⏳ Carregando prestadores...</div>;
+  }
+  
+  if (providers.length === 0) {
+    return <div className="text-center text-xl p-8">Nenhum prestador encontrado.</div>;
+  }
 
   return (
     <div className="space-y-4">

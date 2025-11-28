@@ -10,9 +10,14 @@ import {
 
 // Este hook vai nos ajudar a sincronizar
 import { type CarouselApi } from "@/components/ui/carousel";
+import { ProviderImages } from "@/types/types";
 import { useEffect, useState } from "react";
 
-export function ProviderGallery({ gallery }: { gallery: string[] }) {
+interface GalleryProps {
+  gallery: ProviderImages[]
+}
+
+export function ProviderGallery({ gallery }: GalleryProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   // 2. APIs para ambos os carrosséis
@@ -38,18 +43,19 @@ export function ProviderGallery({ gallery }: { gallery: string[] }) {
     };
   }, [mainApi, thumbApi]);
 
+
   return (
     <div className="flex flex-col gap-4">
       {/* CARROSSEL PRINCIPAL */}
       <Carousel setApi={setMainApi} className="w-full">
         <CarouselContent>
+         
           {/* AQUI: Mapeie o array 'gallery' */}
-          {gallery.map((url, index) => (
-            <CarouselItem key={index}>
-              {/* Exemplo de imagem responsiva, ajuste as classes conforme necessário */}
+          {gallery.map((img, index) => (
+            <CarouselItem key={img.id}>
               <img
-                src={url}
-                alt={`Galeria Imagem ${index + 1}`}
+                src={img.url}
+                alt={img.altText}
                 className="w-full h-80 lg:h-[500px] object-cover rounded-lg"
               />
             </CarouselItem>
@@ -72,9 +78,9 @@ export function ProviderGallery({ gallery }: { gallery: string[] }) {
         }}
       >
         <CarouselContent className="-ml-1">
-          {gallery.map((url, index) => (
+          {gallery.map((img, index) => (
             <CarouselItem
-              key={index}
+              key={img.id}
               className="pl-1 basis-1/5 sm:basis-1/6 md:basis-1/8 lg:basis-1/10 cursor-pointer"
             >
               <div
@@ -90,8 +96,8 @@ export function ProviderGallery({ gallery }: { gallery: string[] }) {
                 }`}
               >
                 <img
-                  src={url}
-                  alt={`Thumbnail ${index + 1}`}
+                  src={img.url}
+                  alt={img.altText}
                   className="w-full h-16 object-cover rounded" // Altura fixa para miniaturas
                 />
               </div>

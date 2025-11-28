@@ -3,12 +3,13 @@
 
 // Importações de bibliotecas e componentes.
 import * as z from "zod";
-import { useForm, Control, FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuthStore } from "@/store/useAuthStore";
 import {
-  petOwnerRegisterSchema,
-  serviceProviderRegisterSchema,
-} from "../schema/registerSchema";
+  PetOwnerSignUpValues,
+  petOwnerSignUpSchema,
+} from "@/schemas/authSchemas";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,11 +24,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { FaGoogle } from "react-icons/fa6";
 import Image from "next/image";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
 
 export default function RegisterPage() {
-  const ownerForm = useForm<z.infer<typeof petOwnerRegisterSchema>>({
+  const ownerForm = useForm<PetOwnerSignUpValues>({
     // `resolver` integra o Zod com o React Hook Form para validação.
-    resolver: zodResolver(petOwnerRegisterSchema),
+    resolver: zodResolver(petOwnerSignUpSchema),
     // `mode: "onBlur"` faz com que a validação seja acionada quando o usuário sai de um campo.
     mode: "onBlur",
     // Valores iniciais do formulário.
@@ -36,18 +40,40 @@ export default function RegisterPage() {
       password: "",
       confirmPassword: "",
       fullName: "",
-      phone: "",
+      phoneNumber: "",
       cpf: "",
-      street: "",
+      address: "",
       city: "",
       state: "",
-      zipCode: "",
+      cep: "",
     },
   });
+
+  const router = useRouter();
+
+  const register = useAuthStore((state) => state.registerPetOwner);
+  const isLoading = useAuthStore((state) => state.isLoading);
+
   // Função chamada ao submeter o formulário de Tutor.
   // Ela só será executada se a validação do `petOwnerRegisterSchema` passar.
-  async function onOwnerSubmit(data: z.infer<typeof petOwnerRegisterSchema>) {
-    console.log(data);
+  async function onOwnerSubmit(data: PetOwnerSignUpValues) {
+    try {
+      await register({
+        ...data,
+        role: "PET_OWNER",
+      });
+
+      ownerForm.reset();
+      toast("Sua conta foi criada com sucesso!");
+      router.push("/buscar-prestador")
+    
+    } catch (error) {
+      toast(
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao cadastrar"
+      );
+    }
   }
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-50 p-4">
@@ -115,7 +141,7 @@ export default function RegisterPage() {
                   />
                   <FormField
                     control={ownerForm.control}
-                    name="phone"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Telefone</FormLabel>
@@ -176,9 +202,10 @@ export default function RegisterPage() {
                         <FormLabel>CPF</FormLabel>
                         <FormControl>
                           <Input
-                            className="h-11"
-                            placeholder="Seu CPF"
                             {...field}
+                            className="h-11"
+                            ref={field.ref}
+                            placeholder="000.000.000-00"
                           />
                         </FormControl>
                         <FormMessage />
@@ -188,7 +215,7 @@ export default function RegisterPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                       control={ownerForm.control}
-                      name="street"
+                      name="address"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>Endereço</FormLabel>
@@ -241,7 +268,7 @@ export default function RegisterPage() {
                     />
                     <FormField
                       control={ownerForm.control}
-                      name="zipCode"
+                      name="cep"
                       render={({ field }) => (
                         <FormItem>
                           <FormLabel>CEP</FormLabel>
@@ -261,14 +288,22 @@ export default function RegisterPage() {
                     type="submit"
                     className="w-full h-11 bg-purple-700 hover:bg-purple-800"
                   >
-                    Cadastrar como Tutor
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                        Cadastrando...
+                      </>
+                    ) : (
+                      "Cadastrar"
+                    )}
                   </Button>
-                   <Button
-                      className="bg-purple-100 w-full h-11 text-purple-700 cursor-pointer p-1.5"
-                      variant="secondary"
-                    >
-                      <FaGoogle className="text-violet-700 mr-2" /> Entre com google
-                    </Button>
+                  <Button
+                    className="bg-purple-100 w-full h-11 text-purple-700 cursor-pointer p-1.5"
+                    variant="secondary"
+                  >
+                    <FaGoogle className="text-violet-700 mr-2" /> Entre com
+                    google
+                  </Button>
                 </form>
               </Form>
             </CardContent>

@@ -3,14 +3,11 @@
 
 // Importações de bibliotecas e componentes.
 import * as z from "zod";
-import { useForm, Control, FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import {
-  petOwnerRegisterSchema,
-  serviceProviderRegisterSchema,
-} from "../schema/registerSchema";
+import { petProviderSignUpSchema, PetProviderSignValues } from "@/schemas/authSchemas";
 import { FaGoogle } from "react-icons/fa6";
-import { Separator } from "@/components/ui/separator";
+import { useAuthStore } from "@/store/useAuthStore";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -23,7 +20,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 import {
   Select,
   SelectContent,
@@ -33,30 +30,52 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import Image from "next/image";
+import { Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 export default function RegisterPage() {
   // --- GERENCIAMENTO DO FORMULÁRIO DE PRESTADOR ---
   // Cria uma instância separada para o formulário de Prestador de Serviços.
-  const providerForm = useForm<z.infer<typeof serviceProviderRegisterSchema>>({
-    resolver: zodResolver(serviceProviderRegisterSchema),
+  const providerForm = useForm<PetProviderSignValues>({
+    resolver: zodResolver(petProviderSignUpSchema),
     mode: "onBlur",
     defaultValues: {
       email: "",
       password: "",
       confirmPassword: "",
       fullName: "",
-      phone: "",
-      serviceType: undefined,
-      experienceDescription: "",
+      activity: undefined,
+      description: "",
+      phoneNumber: '',
     },
   });
+
+  const register = useAuthStore((state) => state.registerPetProvider);
+  const isLoading = useAuthStore((state) => state.isLoading);
+
 
   // Função chamada ao submeter o formulário de Prestador.
   // Ela só será executada se a validação do `serviceProviderRegisterSchema` passar.
   async function onProviderSubmit(
-    data: z.infer<typeof serviceProviderRegisterSchema>
+    data: PetProviderSignValues
   ) {
-    console.log(data);
+     try {
+      await register({
+        ...data,
+        role: "PET_PROVIDER",
+      });
+
+      providerForm.reset();
+      toast("Sua conta foi criada com sucesso!");
+      console.log(data);
+    
+    } catch (error) {
+      toast(
+        error instanceof Error
+          ? error.message
+          : "Erro desconhecido ao cadastrar"
+      );
+    }
   }
 
   return (
@@ -126,7 +145,7 @@ export default function RegisterPage() {
                   />
                   <FormField
                     control={providerForm.control}
-                    name="phone"
+                    name="phoneNumber"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Telefone</FormLabel>
@@ -181,7 +200,7 @@ export default function RegisterPage() {
                   </div>
                   <FormField
                     control={providerForm.control}
-                    name="serviceType"
+                    name="activity"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Tipo de Serviço</FormLabel>
@@ -201,7 +220,9 @@ export default function RegisterPage() {
                             <SelectItem value="hospedagem">
                               Hospedagem
                             </SelectItem>
-                            <SelectItem value="banho">Banho e Tosa</SelectItem>
+                            <SelectItem value="pet-shop">Pet Shop</SelectItem>
+                            <SelectItem value="veterinaria">Veterinária</SelectItem>
+                            <SelectItem value="adestramento">Adestramento</SelectItem>
                           </SelectContent>
                         </Select>
                         <FormMessage />
@@ -210,7 +231,7 @@ export default function RegisterPage() {
                   />
                   <FormField
                     control={providerForm.control}
-                    name="experienceDescription"
+                    name="description"
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel>Descrição da Experiência</FormLabel>
@@ -226,15 +247,18 @@ export default function RegisterPage() {
                   />
                   <Button
                     type="submit"
-                    className="w-full h-11 bg-purple-700 hover:bg-purple-800"
+                    className="w-full h-11 bg-purple-700 hover:bg-purple-800 cursor-pointer"
                   >
-                    Cadastrar como Prestador
+                    {isLoading ? <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />{" "}
+                      Cadastrando...
+                    </> : "Cadastrar"}
                   </Button>
                   <Button
                     className="bg-purple-100 w-full h-11 text-purple-700 cursor-pointer p-1.5"
                     variant="secondary"
                   >
-                    <FaGoogle className="text-violet-700 mr-2" /> Entre com
+                    <FaGoogle className="text-violet-700 mr-2 cursor-pointer" /> Entre com
                     google
                   </Button>
                 </form>

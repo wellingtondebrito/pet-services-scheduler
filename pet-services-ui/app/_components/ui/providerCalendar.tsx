@@ -1,39 +1,63 @@
-// ProviderCalendar.tsx
+'use client'
 
-// Importe a interface Availability (ajuste o caminho se necessário)
-import { Availability } from "@/data/mock-providers"; 
-import { Matcher } from "react-day-picker";
-import { Calendar } from "@/components/ui/calendar";
+import { Calendar } from "@/components/ui/calendar"
+import { useState } from "react"
+import { useProviderStore } from "@/store/useProviderStore";
 import { ptBR } from 'date-fns/locale';
 
-// 🎯 Defina a interface para aceitar o objeto Availability
-interface ProviderCalendarProps {
-  availabilityData: Availability; 
-}
+export function ProviderCalendar() {
+  const { currentProvider } = useProviderStore()
+  const [date, setDate] = useState<Date | undefined>(new Date());
 
-export function ProviderCalendar({ availabilityData }: ProviderCalendarProps) {
-  
-  // 1. Converte o array de strings (AAAA-MM-DD) para array de objetos Date
-  const availableDates: Date[] = availabilityData.available.map(dateString => new Date(dateString));
+  console.log("currentProvider", currentProvider?.availabilities)
 
-  // 2. Define os modificadores usando os objetos Date convertidos
-  const modifiers = {
-    available: availableDates as Matcher[], 
-  };
-  
-  // 3. Define os estilos (sem alterações)
-  const modifiersClassNames = {
-    available: "bg-purple-500 text-white font-bold rounded-full",
-  };
+  const daysOfWeekAvailable =
+    currentProvider?.availabilities?.map((day) => {
+      let slotDay;
+      switch (day.dayOfWeek) {
+        case "MONDAY": slotDay = 1; break;
+        case "TUESDAY": slotDay = 2; break;
+        case "WEDNESDAY": slotDay = 3; break;
+        case "THURSDAY": slotDay = 4; break;
+        case "FRIDAY": slotDay = 5; break;
+        case "SATURDAY": slotDay = 6; break;
+        case "SUNDAY": slotDay = 0; break;
+        default: slotDay = -1; break; // Retorna -1 para dias inválidos
+      }
+      return slotDay;
+    }).filter((day) => day !== -1) || [];
+
+
+  // Novo objeto para definir o modificador 'availableDays'
+  const availableDaysModifier = { dayOfWeek: daysOfWeekAvailable };
+  // Novo objeto para definir o modificador 'pastDays'
+  const pastDaysModifier = { before: new Date() };
+
+
+  console.log("Dias da semana", daysOfWeekAvailable)
+  //Lógica para desabilitar os dias em que o prestador NÃO trabalha
+ const allDaysOfWeek = [0, 1, 2, 3, 4, 5, 6];
+  const unavailableDays = allDaysOfWeek.filter(
+    (day) => !daysOfWeekAvailable.includes(day)
+  );
 
   return (
     <Calendar
-      mode="single" // Permite selecionar uma única data
+      mode="single"
+      selected={date}
+      onSelect={setDate}
       locale={ptBR}
-      modifiers={modifiers}
-      modifiersClassNames={modifiersClassNames}
-      className="rounded-md border p-4"
-      avaliabilityData={availabilityData}
+      
+      // Aplicando a restrição dos dias da semana e datas passadas
+      disabled={[
+        {before: new Date()},
+        {dayOfWeek: unavailableDays}
+      ]}
+      modifiers={{ 
+        availableDays: availableDaysModifier,
+        pastDays: pastDaysModifier 
+      }}
+      className="rounded-md border shadow w-full"
     />
   );
 }
